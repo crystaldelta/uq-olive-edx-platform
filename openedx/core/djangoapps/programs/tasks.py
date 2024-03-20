@@ -493,7 +493,7 @@ def award_course_certificate(self, username, course_run_key):
         )
         return
 
-    LOGGER.info(f"Running task award_course_certificate for username {user}")
+    LOGGER.info(f"Running task award_course_certificate for user {user}")
     try:
         course_key = CourseKey.from_string(course_run_key)
         # Get the cert for the course key and username if it's both passing and available in professional/verified
@@ -504,8 +504,8 @@ def award_course_certificate(self, username, course_run_key):
             )
         except GeneratedCertificate.DoesNotExist:
             LOGGER.warning(
-                f"Task award_course_certificate was called for user {user} in course {course_key} but this learner has "
-                "not earned a course certificate in this course run"
+                f"Task award_course_certificate was called for user {user} in course run {course_key} but this learner "
+                "has not earned a course certificate in this course run"
             )
             return
 
@@ -614,7 +614,7 @@ def revoke_program_certificates(self, username, course_key):  # lint-amnesty, py
         course_specific_programs = inverted_programs.get(course_key)
         if not course_specific_programs:
             LOGGER.warning(
-                f"Task revoke_program_certificates was called for user {username} and course {course_key} with no "
+                f"Task revoke_program_certificates was called for user {student} and course run {course_key} with no "
                 "engaged programs"
             )
             return
@@ -695,7 +695,7 @@ def revoke_program_certificates(self, username, course_key):  # lint-amnesty, py
     else:
         LOGGER.info(f"No program certificates to revoke from user {student}")
 
-    LOGGER.info(f"Successfully completed the task revoke_program_certificates for username {student}")
+    LOGGER.info(f"Successfully completed the task revoke_program_certificates for user {student}")
 
 
 @shared_task(bind=True, ignore_result=True)
