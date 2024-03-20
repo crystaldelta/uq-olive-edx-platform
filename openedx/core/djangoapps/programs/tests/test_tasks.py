@@ -355,8 +355,6 @@ class AwardProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiCo
             TASKS_MODULE + ".LOGGER.exception"
         ) as mock_warning:
             tasks.award_program_certificates.delay(self.student.username).get()
-
-        import pdb; pdb.set_trace()
         assert mock_award_program_certificate.call_count == 3
         mock_warning.assert_called_once_with(
             f"Failed to award program certificate to user {self.student} in program 1: boom"
@@ -823,7 +821,6 @@ class RevokeProgramCertificatesTestCase(CatalogIntegrationMixin, CredentialsApiC
             tasks.revoke_program_certificates.delay(self.student.username, self.course_key).get()
 
         assert mock_revoke_program_certificate.call_count == 3
-        import pdb; pdb.set_trace()
         mock_warning.assert_called_once_with(
             f"Failed to revoke program certificate from user {self.student} in program 1: boom"
         )
