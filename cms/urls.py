@@ -23,6 +23,7 @@ from openedx.core.apidocs import api_info
 from openedx.core.djangoapps.password_policy import compliance as password_policy_compliance
 from openedx.core.djangoapps.password_policy.forms import PasswordPolicyAwareAdminAuthForm
 from openedx.core import toggles as core_toggles
+from openedx.core.djangoapps.user_authn.urls import common_urlpatterns as user_authn_urls_common
 
 
 django_autodiscover()
@@ -48,8 +49,7 @@ LIBRARY_KEY_PATTERN = r'(?P<library_key_string>library-v1:[^/+]+\+[^/+]+)'
 
 # oauth2_urlpatterns needs to be first to override any other login and
 # logout related views.
-urlpatterns = oauth2_urlpatterns + [
-    path('', include('openedx.core.djangoapps.user_authn.urls_common')),
+urlpatterns = oauth2_urlpatterns + user_authn_urls_common + [
     path('', include('common.djangoapps.student.urls')),
     path('transcripts/upload', contentstore_views.upload_transcripts, name='upload_transcripts'),
     path('transcripts/download', contentstore_views.download_transcripts, name='download_transcripts'),
