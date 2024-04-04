@@ -1,26 +1,25 @@
 """Middleware classes for third_party_auth."""
 
+import urlparse
 
-import six.moves.urllib.parse
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse
-from django.utils.deprecation import MiddlewareMixin
-from django.utils.translation import gettext as _
+from django.utils.translation import ugettext as _
 from requests import HTTPError
 from social_django.middleware import SocialAuthExceptionMiddleware
 
-from common.djangoapps.student.helpers import get_next_url_for_login_page
+from student.helpers import get_next_url_for_login_page
 
 from . import pipeline
 
 
-class ExceptionMiddleware(SocialAuthExceptionMiddleware, MiddlewareMixin):
+class ExceptionMiddleware(SocialAuthExceptionMiddleware):
     """Custom middleware that handles conditional redirection."""
 
     def get_redirect_uri(self, request, exception):
         # Fall back to django settings's SOCIAL_AUTH_LOGIN_ERROR_URL.
-        redirect_uri = super().get_redirect_uri(request, exception)
+        redirect_uri = super(ExceptionMiddleware, self).get_redirect_uri(request, exception)
 
         # Safe because it's already been validated by
         # pipeline.parse_query_params. If that pipeline step ever moves later
@@ -40,7 +39,7 @@ class ExceptionMiddleware(SocialAuthExceptionMiddleware, MiddlewareMixin):
         referer_url = request.META.get('HTTP_REFERER', '')
         if (referer_url and isinstance(exception, HTTPError) and
                 exception.response.status_code == 502):
-            referer_url = six.moves.urllib.parse.urlparse(referer_url).path
+            referer_url = urlparse.urlparse(referer_url).path
             if referer_url == reverse('signin_user'):
                 messages.error(request, _('Unable to connect with the external provider, please try again'),
                                extra_tags='social-auth')
@@ -48,4 +47,4 @@ class ExceptionMiddleware(SocialAuthExceptionMiddleware, MiddlewareMixin):
                 redirect_url = get_next_url_for_login_page(request)
                 return redirect('/login?next=' + redirect_url)
 
-        return super().process_exception(request, exception)
+        return super(ExceptionMiddleware, self).process_exception(request, exception)
